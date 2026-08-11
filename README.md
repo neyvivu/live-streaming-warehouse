@@ -6,7 +6,7 @@ warehouse**, and **data quality checks** that gate the load.
 
 ```
                     ┌──────────────┐
-  producer.py  ───▶ │    Kafka     │ ───┐
+  producer.py  ──▶ │    Kafka     │ ───┐
   (join/comment/    │  (Redpanda)  │    │
    gift/leave)      └──────────────┘    │
                                         ▼
@@ -89,11 +89,11 @@ ALL CHECKS PASSED
 - **Why a watermark?** The producer emits events up to 90s late on purpose.
   A 20s watermark bounds streaming state while still admitting most late
   arrivals; anything later is dropped rather than growing state forever.
-- **Fact grain** is one row per (date, room, user, gift) rollup — the lowest
+- **Fact grain** is one row per (date, room, user, gift) rollup, the lowest
   level the serving queries need, which keeps the fact table narrow without
   losing the ability to re-aggregate.
 - **Append-mode windows** only emit once the watermark passes the window end,
   so the defaults (30s window / 20s watermark) are tuned for a short local run.
   Production values would be minutes.
 - **Reconciliation check** (`SUM(fact.event_count) == COUNT(stg_events)`) is
-  the one that catches real bugs — a bad join silently drops or fans out rows.
+  the one that catches real bugs, a bad join silently drops or fans out rows.
