@@ -44,7 +44,7 @@ warehouse**, and **data quality checks** that gate the load.
 pip install -r requirements.txt
 ```
 
-**Local (no broker needed)** — the file source stands in for Kafka:
+**Local (no broker needed)** - the file source stands in for Kafka:
 
 ```bash
 python -m src.producer --sink file --rate 300 --seconds 20 --outdir data/raw
