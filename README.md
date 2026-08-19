@@ -6,7 +6,7 @@ warehouse**, and **data quality checks** that gate the load.
 
 ```
                     ┌──────────────┐
-  producer.py  ──▶ │    Kafka     │ ───┐
+  producer.py  ───▶ │    Kafka     │ ───┐
   (join/comment/    │  (Redpanda)  │    │
    gift/leave)      └──────────────┘    │
                                         ▼
@@ -35,9 +35,9 @@ warehouse**, and **data quality checks** that gate the load.
 |---|---|
 | `src/producer.py` | Event generation; deliberately emits ~3% **late events** |
 | `src/streaming_job.py` | **Watermarking**, **tumbling-window** aggregation, dual sinks, checkpointing |
-| `sql/warehouse.sql` | **Dimensional modeling** — conformed dimensions, declared fact grain |
-| `src/warehouse.py` | **Data quality gates** — referential integrity, dedupe, reconciliation |
-| `src/dashboard.py` | **BI serving layer** — Streamlit dashboard, every tile a SQL query on the star schema |
+| `sql/warehouse.sql` | **Dimensional modeling**: conformed dimensions, declared fact grain |
+| `src/warehouse.py` | **Data quality gates**: referential integrity, dedupe, reconciliation |
+| `src/dashboard.py` | **BI serving layer**: Streamlit dashboard, every tile a SQL query on the star schema |
 
 ## Run it
 
@@ -45,7 +45,7 @@ warehouse**, and **data quality checks** that gate the load.
 pip install -r requirements.txt
 ```
 
-**Local (no broker needed)** - the file source stands in for Kafka:
+**Local (no broker needed).** The file source stands in for Kafka:
 
 ```bash
 python -m src.producer --sink file --rate 300 --seconds 20 --outdir data/raw
@@ -98,4 +98,4 @@ ALL CHECKS PASSED
   so the defaults (30s window / 20s watermark) are tuned for a short local run.
   Production values would be minutes.
 - **Reconciliation check** (`SUM(fact.event_count) == COUNT(stg_events)`) is
-  the one that catches real bugs, a bad join silently drops or fans out rows.
+  the one that catches real bugs, because a bad join silently drops or fans out rows.

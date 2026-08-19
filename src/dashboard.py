@@ -125,8 +125,12 @@ def main():
     with left:
         st.subheader("Top rooms by coins")
         rooms = q(con, TOP_ROOMS)
-        st.bar_chart(rooms.set_index("room")["coins"])
-        st.dataframe(rooms, use_container_width=True, hide_index=True)
+        # st.bar_chart sorts the index alphabetically, so prefix the rank to keep
+        # the bars in descending-coins order.
+        chart = rooms.copy()
+        chart["rank"] = [f"{i+1:02d} {r}" for i, r in enumerate(chart["room"])]
+        st.bar_chart(chart.set_index("rank")["coins"], horizontal=True)
+        st.dataframe(rooms, width="stretch", hide_index=True)
 
     with right:
         st.subheader("Engagement mix")
@@ -137,10 +141,10 @@ def main():
         ))
 
         st.subheader("By country")
-        st.dataframe(q(con, BY_COUNTRY), use_container_width=True, hide_index=True)
+        st.dataframe(q(con, BY_COUNTRY), width="stretch", hide_index=True)
 
     st.subheader("Gift revenue mix")
-    st.dataframe(q(con, GIFT_MIX), use_container_width=True, hide_index=True)
+    st.dataframe(q(con, GIFT_MIX), width="stretch", hide_index=True)
 
     # Real-time layer, read straight from the streaming sink
     st.subheader("Real-time windows (streaming layer)")
@@ -151,9 +155,9 @@ def main():
             ORDER BY window_start DESC, coins DESC
             LIMIT 20
         """).fetchdf()
-        st.dataframe(rt, use_container_width=True, hide_index=True)
+        st.dataframe(rt, width="stretch", hide_index=True)
     except Exception:
-        st.info("No windowed metrics yet — the streaming job emits them once the watermark "
+        st.info("No windowed metrics yet. The streaming job emits them once the watermark "
                 "passes each window end.")
 
     st.subheader("Data quality")
@@ -166,7 +170,7 @@ def main():
     (st.success if failed == 0 else st.error)(
         f"{len(dq) - failed}/{len(dq)} checks passing"
     )
-    st.dataframe(dq, use_container_width=True, hide_index=True)
+    st.dataframe(dq, width="stretch", hide_index=True)
 
 
 if __name__ == "__main__":

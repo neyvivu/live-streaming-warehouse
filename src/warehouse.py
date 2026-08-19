@@ -56,7 +56,7 @@ CHECKS = [
 def build(lake, db, sql_path):
     files = glob.glob(os.path.join(lake, "**", "*.parquet"), recursive=True)
     if not files:
-        sys.exit(f"no parquet found under {lake} — run the streaming job first")
+        sys.exit(f"no parquet found under {lake}; run the streaming job first")
     print(f"loading {len(files)} parquet file(s) from {lake}")
 
     con = duckdb.connect(db)

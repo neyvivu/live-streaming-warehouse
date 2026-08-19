@@ -5,7 +5,7 @@
 --   dim_gift ─┘
 --
 -- Grain of the fact table: one row per (room, user, date, gift) engagement
--- rollup — the lowest level the serving queries actually need.
+-- rollup, the lowest level the serving queries actually need.
 
 CREATE OR REPLACE TABLE stg_events AS
 SELECT

@@ -24,7 +24,7 @@ COUNTRIES = ["SG", "VN", "ID", "MY", "TH", "PH"]
 
 def make_event(rooms, users, late_pct=0.03):
     now = datetime.now(timezone.utc)
-    # A small share of events arrive late — this is what the watermark handles.
+    # A small share of events arrive late; this is what the watermark handles.
     lag_s = random.randint(20, 90) if random.random() < late_pct else random.randint(0, 3)
     event_ts = now.timestamp() - lag_s
     etype = random.choices(EVENT_TYPES, EVENT_WEIGHTS)[0]
