@@ -37,6 +37,7 @@ warehouse**, and **data quality checks** that gate the load.
 | `src/streaming_job.py` | **Watermarking**, **tumbling-window** aggregation, dual sinks, checkpointing |
 | `sql/warehouse.sql` | **Dimensional modeling** — conformed dimensions, declared fact grain |
 | `src/warehouse.py` | **Data quality gates** — referential integrity, dedupe, reconciliation |
+| `src/dashboard.py` | **BI serving layer** — Streamlit dashboard, every tile a SQL query on the star schema |
 
 ## Run it
 
@@ -50,6 +51,7 @@ pip install -r requirements.txt
 python -m src.producer --sink file --rate 300 --seconds 20 --outdir data/raw
 python -m src.streaming_job --source file --indir data/raw --seconds 100
 python -m src.warehouse --lake data/lake/events --db data/warehouse.duckdb
+streamlit run src/dashboard.py                  # BI dashboard on the warehouse
 ```
 
 **With Kafka:**
