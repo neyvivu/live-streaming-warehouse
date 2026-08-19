@@ -1,32 +1,32 @@
-# Live-Streaming Data Warehouse (batch + real-time)
+﻿# Live-Streaming Data Warehouse (batch + real-time)
 
-An end-to-end data pipeline for live-streaming engagement events: a **Kafka →
+An end-to-end data pipeline for live-streaming engagement events: a **Kafka â†’
 Spark Structured Streaming** real-time layer, an **offline star-schema
 warehouse**, and **data quality checks** that gate the load.
 
 ```
-                    ┌──────────────┐
-  producer.py  ───▶ │    Kafka     │ ───┐
-  (join/comment/    │  (Redpanda)  │    │
-   gift/leave)      └──────────────┘    │
-                                        ▼
-                            ┌───────────────────────┐
-                            │  Spark Structured     │
-                            │  Streaming            │
-                            │  • watermark (late)   │
-                            │  • tumbling windows   │
-                            └───────┬───────────────┘
-                        ┌───────────┴───────────┐
-                        ▼                       ▼
+                    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+  producer.py  â”€â”€â”€â–¶ â”‚    Kafka     â”‚ â”€â”€â”€â”
+  (join/comment/    â”‚  (Redpanda)  â”‚    â”‚
+   gift/leave)      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â”‚
+                                        â–¼
+                            â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                            â”‚  Spark Structured     â”‚
+                            â”‚  Streaming            â”‚
+                            â”‚  â€¢ watermark (late)   â”‚
+                            â”‚  â€¢ tumbling windows   â”‚
+                            â””â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                        â–¼                       â–¼
               data/lake/events         data/lake/room_metrics
               (raw, append)            (real-time serving)
-                        │
-                        ▼
-              ┌──────────────────────┐
-              │  DuckDB warehouse    │   dim_room ─┐
-              │  star schema         │   dim_user ─┼──< fact_live_engagement
-              │  + quality checks    │   dim_gift ─┤
-              └──────────────────────┘   dim_date ─┘
+                        â”‚
+                        â–¼
+              â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+              â”‚  DuckDB warehouse    â”‚   dim_room â”€â”
+              â”‚  star schema         â”‚   dim_user â”€â”¼â”€â”€< fact_live_engagement
+              â”‚  + quality checks    â”‚   dim_gift â”€â”¤
+              â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜   dim_date â”€â”˜
 ```
 
 ## What each piece demonstrates
@@ -99,3 +99,4 @@ ALL CHECKS PASSED
   Production values would be minutes.
 - **Reconciliation check** (`SUM(fact.event_count) == COUNT(stg_events)`) is
   the one that catches real bugs, because a bad join silently drops or fans out rows.
+
