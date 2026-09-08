@@ -73,6 +73,41 @@ The BI layer reads only from the warehouse, so business logic lives in one place
 - Latest real-time windows read straight from the streaming sink
 - Data quality panel surfacing the same six assertions the batch load enforces
 
+## OLAP serving layer
+
+The DuckDB star schema is the modelling layer. ClickHouse is the serving layer:
+the same facts laid out for fast slice-and-dice, plus a pre-aggregated rollup
+that dashboards read instead of scanning the detail.
+
+```bash
+docker compose up -d clickhouse
+python -m src.olap_load --server localhost
+```
+
+| Feature | Why it is there |
+|---|---|
+| `MergeTree` with `ORDER BY (event_date, room_id, user_id)` | Sorting key, so queries filtering a prefix skip granules instead of scanning |
+| `PARTITION BY toYYYYMM(event_date)` | Whole partitions pruned when the query filters on date |
+| `LowCardinality(String)` | Dictionary encoding for repeated values like room, country, gift tier |
+| `AggregatingMergeTree` + materialized view | Rollup maintained on insert, so there is no scheduled job and no stale window |
+| `uniqState` / `uniqMerge` | HyperLogLog, so distinct user counts stay cheap at scale |
+
+Verified run on 5,936 fact rows against ClickHouse 24.8:
+
+```
+partitions on disk:  202608   5936 rows   55.80 KiB
+
+Revenue by gift tier                     51 ms
+Top rooms by coins                       63 ms
+Country breakdown                        55 ms
+Daily rollup from the materialized view  59 ms
+Running total per room (window)          54 ms
+```
+
+The rollup returns the same numbers as the equivalent query against the detail
+table, which is the check that matters: a pre-aggregation nobody trusts gets
+bypassed.
+
 ## Verified output
 
 ```
