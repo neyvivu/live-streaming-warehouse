@@ -108,6 +108,34 @@ The rollup returns the same numbers as the equivalent query against the detail
 table, which is the check that matters: a pre-aggregation nobody trusts gets
 bypassed.
 
+## Governance: lineage, impact analysis, catalog
+
+`src/lineage.py` parses `sql/warehouse.sql` with **sqlglot** and derives the
+governance layer from the code itself, so it cannot drift:
+
+| Feature | Why it is there |
+| --- | --- |
+| **Column-level lineage** | `fact_live_engagement.avg_ingest_lag_s` traces back to `stg_events.event_ts` and `stg_events.ingest_ts`, not just "depends on stg_events" |
+| **Column-aware impact analysis** | `stg_events.coins` touches only `dim_gift` and `fact_live_engagement.coins`. Table-level lineage would flag all four dimensions and tell you nothing about what to re-test |
+| **Catalog check** | Every table must declare owner, grain, freshness target and data classification; gaps are reported |
+
+```
+python -m src.lineage                   # full report
+python -m src.lineage --column coins    # impact of one upstream column
+```
+
+```
+if stg_events.coins changes:
+  dim_gift              coin_value, gift_tier
+  fact_live_engagement  coins
+
+CATALOG GOVERNANCE CHECK
+  [GAP ] dim_user   missing: classification
+```
+
+A hand-written lineage doc is wrong the moment someone edits a query.
+A parsed one cannot drift.
+
 ## Verified output
 
 ```
