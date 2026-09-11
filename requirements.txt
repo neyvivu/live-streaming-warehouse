@@ -6,3 +6,4 @@ pandas>=2.0
 # chdb (embedded ClickHouse) is Linux/macOS only; on Windows use the Docker service
 chdb>=3.0; sys_platform != "win32"
 clickhouse-connect>=0.7
+sqlglot>=25.0
